@@ -1,9 +1,13 @@
 package com.example.calendar;
 
 import android.content.Context;
+import android.content.SyncStatusObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.provider.Settings;
+import android.util.Log;
 
 /**
  * 日期的类
@@ -152,15 +156,15 @@ public class Day {
         }
         switch (backgroundStyle) {
             case 1:
-                paint.setColor(0xFFECF1F4);
+                paint.setColor(0xFFffffff);
                 paint.setStyle(Paint.Style.FILL);
                 break;
             case 2:
                 paint.setStyle(Paint.Style.FILL);
-                paint.setColor(0xFF457BF4);
+                paint.setColor(0xFFcccccc);
                 break;
             case 3:
-                paint.setColor(0xFF457BF4);
+                paint.setColor(0xFFffffff);
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(3);
                 break;

@@ -3,10 +3,13 @@ package com.example.calendar.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.calendar.DateUtils;
 import com.example.calendar.Day;
 
 import java.util.Calendar;
@@ -37,6 +40,7 @@ public class CalendarView extends View {
      */
     public void setCalendar(Calendar calendar) {
         this.calendar = calendar;
+
         if ((calendar.get(Calendar.MONTH) + "" + calendar.get(Calendar.YEAR)).equals(DayManager.getCurrentTime())) {
             DayManager.setCurrent(DayManager.getTempcurrent());
         } else {
@@ -86,10 +90,37 @@ public class CalendarView extends View {
         super.onDraw(canvas);
         //获取day集合并绘制
         List<Day> days = DayManager.createDayByCalendar(calendar, getMeasuredWidth(), getMeasuredHeight());
+        int h=0;
         for (Day day : days) {
+            h=day.height;
             day.drawDays(canvas, context, paint);
         }
+        drawLines(canvas, paint,h,calendar);
 
+    }
+    /**
+     * 绘制线条
+     * @param canvas
+     */
+    private void drawLines(Canvas canvas, Paint mPaint,int h,Calendar mcalendar){
+        int rightX = getWidth();
+        int BottomY = getHeight();
+        int mMonthDays = DateUtils.getMonthDays(mcalendar.get(Calendar.YEAR), mcalendar.get(Calendar.MONTH));
+        int weekNumber = DateUtils.getFirstDayWeek(mcalendar.get(Calendar.YEAR), mcalendar.get(Calendar.MONTH));
+        int rowCount =(mMonthDays + weekNumber - 1) % 7 == 0 ? (mMonthDays + weekNumber - 1) / 7 : (mMonthDays + weekNumber - 1) / 7 + 1;
+        Path path;
+        float startX = 0;
+        float endX = rightX;
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth((float) 2.0);
+        mPaint.setColor(0xFFcccccc);
+        for(int row = 1; row <= rowCount ;row++){
+            float startY = row * h;
+            path = new Path();
+            path.moveTo(startX, startY);
+            path.lineTo(endX, startY);
+            canvas.drawPath(path, mPaint);
+        }
     }
 
     @Override
@@ -105,9 +136,8 @@ public class CalendarView extends View {
                 return super.onTouchEvent(event);
             } else if (locationY == 1) {
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
-                System.out.println("xiaozhu" + calendar.get(Calendar.DAY_OF_WEEK) + ":" + locationX);
                 if (locationX < calendar.get(Calendar.DAY_OF_WEEK) - 1) {
-                    return super.onTouchEvent(event);
+                  return super.onTouchEvent(event);
                 }
             } else if (locationY == calendar.getActualMaximum(Calendar.WEEK_OF_MONTH)) {
                 calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
@@ -117,7 +147,7 @@ public class CalendarView extends View {
             }
             calendar.set(Calendar.WEEK_OF_MONTH, (int) locationY);
             calendar.set(Calendar.DAY_OF_WEEK, (int) (locationX + 1));
-            DayManager.setSelect(calendar.get(Calendar.DAY_OF_MONTH));
+            DayManager.setSelect(calendar.get(Calendar.DAY_OF_MONTH),calendar.getTime());
             if (listener!=null){
                 listener.selectChange(this,calendar.getTime());
             }

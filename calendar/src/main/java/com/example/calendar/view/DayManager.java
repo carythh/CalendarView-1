@@ -1,9 +1,13 @@
 package com.example.calendar.view;
 
+import android.util.Log;
+
 import com.example.calendar.Day;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -130,6 +134,11 @@ public class DayManager {
      */
     static Set<Integer> restDays = new HashSet<>();
 
+    /**
+     * 储存休息天数
+     */
+    public  static Set<String> selectDaysId = new HashSet<>();
+
 
     public static void setTempcurrent(int tempcurrent) {
         DayManager.tempcurrent = tempcurrent;
@@ -144,10 +153,17 @@ public class DayManager {
         DayManager.current = current;
     }
 
-    private static int select = -1;
+    //private static int select = -1;
 
-    public static void setSelect(int select) {
-        DayManager.select = select;
+    public static void setSelect(int select, Date mDate) {
+      //  DayManager.select = select;
+        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM");
+        String selectDate=s.format(mDate)+":"+select;
+        if(selectDaysId.contains(selectDate)){
+            selectDaysId.remove(selectDate);
+        }else {
+            selectDaysId.add(selectDate);
+        }
     }
 
     /**
@@ -168,7 +184,9 @@ public class DayManager {
 
 
         Day day = null;
-
+        int tempYear=calendar.get(Calendar.YEAR);
+        int tempMoth=calendar.get(Calendar.MONTH)+1;
+        String calendarDate=tempYear+"-"+tempMoth;
 
         int dayWidth = width / 7;
         int dayHeight = heigh / (calendar.getActualMaximum(Calendar.WEEK_OF_MONTH) + 1);
@@ -180,7 +198,7 @@ public class DayManager {
             day.location_y = 0;
             day.text = weeks[i];
             //设置日期颜色
-            day.textClor = 0xFF699CF0;
+            day.textClor = 0xFF0f0f0f;
             days.add(day);
 
         }
@@ -197,19 +215,27 @@ public class DayManager {
             day.location_y = calendar.get(Calendar.WEEK_OF_MONTH);
             day.location_x = calendar.get(Calendar.DAY_OF_WEEK) - 1;
             //设置日期选择状态
-            if (i == current - 1) {
-                day.backgroundStyle = 3;
-                day.textClor = 0xFF4384ED;
-
-            } else if (i == select - 1) {
+//            if (i == current - 1) {
+//                day.backgroundStyle = 3;
+//                day.textClor = 0xFF0f0f0f;
+//            } else if (i == select - 1) {
+//                day.backgroundStyle = 2;
+//                day.textClor = 0xFF0f0f0f;
+//            } else {
+//                day.backgroundStyle = 1;
+//                day.textClor = 0xFF0f0f0f;
+//            }
+            //Log.e("===选择=="+calendarDate,"==9999=1="+day.backgroundStyle);
+            int idtemp=i+1;
+            String mtemp=calendarDate+":"+idtemp;
+            if(selectDaysId.contains(mtemp)){
                 day.backgroundStyle = 2;
-
-                day.textClor = 0xFFFAFBFE;
-
-            } else {
+                day.textClor = 0xFF0f0f0f;
+            }else{
                 day.backgroundStyle = 1;
-                day.textClor = 0xFF8696A5;
+                day.textClor = 0xFF0f0f0f;
             }
+            Log.e("===选择==",mtemp+"==9999=2="+day.backgroundStyle);
             //设置工作状态
             if (restDays.contains(1 + i)) {
                 day.workState = 0;
